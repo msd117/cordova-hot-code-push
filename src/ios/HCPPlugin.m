@@ -296,12 +296,16 @@ static NSString *const DEFAULT_STARTING_PAGE = @"index.html";
     
     NSString * basePath = [_filesStructure.wwwFolder.absoluteString stringByReplacingOccurrencesOfString:@"file://" withString:@""];
     // 先要确保webVieEngine能响应以下两个方法
-    if([self.webViewEngine respondsToSelector:@selector(setServerPath:)] && [self.webViewEngine respondsToSelector:@selector(basePath)]){
+    
+    if([self.webViewEngine respondsToSelector:@selector(setServerBasePath:)]){
         // 先判断之前的本地服务根目录是否与将要切换的路径相同，如果不相同则切换，否则不切换
         NSString * preBasePath = [self.webViewEngine performSelector:@selector(basePath)];
         if( ![preBasePath isEqualToString:basePath] && [[NSFileManager defaultManager] fileExistsAtPath:basePath]){
             dispatch_async(dispatch_get_main_queue(), ^{
-                [self.webViewEngine performSelector:@selector(setServerPath:) withObject:basePath];
+                NSArray* path = [NSArray arrayWithObject:basePath];
+                CDVInvokedUrlCommand * commond = [[CDVInvokedUrlCommand alloc] initWithArguments:path callbackId:@"reset" className:@"Reset" methodName:@"reset"];
+                
+                [self.webViewEngine performSelector:@selector(setServerBasePath:) withObject:commond];
             });
             
         }
@@ -359,7 +363,7 @@ static NSString *const DEFAULT_STARTING_PAGE = @"index.html";
 }
 
 /**
- *  Notify JavaScript module about occured event. 
+ *  Notify JavaScript module about occured event.
  *  For that we will use callback, received on plugin initialization stage.
  *
  *  @param result message to send to web side
@@ -463,7 +467,7 @@ static NSString *const DEFAULT_STARTING_PAGE = @"index.html";
 }
 
 /**
- *  Remove subscription. 
+ *  Remove subscription.
  *  Should be called only when the application is terminated.
  */
 - (void)unsubscribeFromEvents {
@@ -684,7 +688,7 @@ static NSString *const DEFAULT_STARTING_PAGE = @"index.html";
     // send notification to the default callback
     [self invokeDefaultCallbackWithMessage:pluginResult];
 
-     // 热更新下载完毕时需要切换一下服务根目录   
+     // 热更新下载完毕时需要切换一下服务根目录
     [self switchServerBaseToExternalPath];
     // reload application to the index page
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
