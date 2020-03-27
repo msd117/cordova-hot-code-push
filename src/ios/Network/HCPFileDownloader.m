@@ -92,7 +92,14 @@ static NSUInteger const TIMEOUT = 300;
 - (void)launchDownloadTaskForFile:(HCPManifestFile *)file {
     NSURL *url = [_contentURL URLByAppendingPathComponent:file.name];
     NSLog(@"Starting file download: %@", url.absoluteString);
-    
+    NSDictionary* data = @{@"current download":@(_downloadCounter), @"total":@(_filesList.count)};
+    NSNotification *notification = [HCPEvents notificationWithName:kHCPDownloadProgressEvent
+                                                   applicationConfig:_newConfig
+                                                              taskId:_workerId
+                                                              data:data];
+
+      [[NSNotificationCenter defaultCenter] postNotification:notification];
+
     [[_session downloadTaskWithURL:url] resume];
 }
 

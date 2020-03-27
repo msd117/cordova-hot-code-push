@@ -18,10 +18,12 @@ NSString *const kHCPNothingToInstallEvent = @"chcp_nothingToInstall";
 NSString *const kHCPBeforeBundleAssetsInstalledOnExternalStorageEvent = @"chcp_beforeAssetsInstalledOnExternalStorage";
 NSString *const kHCPBundleAssetsInstalledOnExternalStorageEvent = @"chcp_assetsInstalledOnExternalStorage";
 NSString *const kHCPBundleAssetsInstallationErrorEvent = @"chcp_assetsInstallationError";
+NSString *const kHCPDownloadProgressEvent = @"chcp_downloadprogress";
 
 NSString *const kHCPEventUserInfoErrorKey = @"error";
 NSString *const kHCPEventUserInfoTaskIdKey = @"taskId";
 NSString *const kHCPEventUserInfoApplicationConfigKey = @"appConfig";
+NSString *const kHCPEventUserInfoDataKey = @"data";
 
 @implementation HCPEvents
 

@@ -59,6 +59,11 @@ extern NSString *const kHCPBundleAssetsInstalledOnExternalStorageEvent;
 extern NSString *const kHCPBundleAssetsInstallationErrorEvent;
 
 /**
+ * Envent for upgrade files download progress
+*/
+extern NSString *const kHCPDownloadProgressEvent;
+
+/**
  *  Key for error object in the user info dictionary that is attached to the event.
  */
 extern NSString *const kHCPEventUserInfoErrorKey;
@@ -72,6 +77,8 @@ extern NSString *const kHCPEventUserInfoTaskIdKey;
  *  Key for the applpication config object in the user info dictionary that is attached to the event.
  */
 extern NSString *const kHCPEventUserInfoApplicationConfigKey;
+
+extern NSString *const kHCPEventUserInfoDataKey;
 
 /**
  *  Helper class tor create plugin specific notifications about work process (download or installation).

@@ -31,6 +31,7 @@
     HCPPluginInternalPreferences *_pluginInternalPrefs;
     NSString *_installationCallback;
     NSString *_downloadCallback;
+    NSString * _progressCallback;
     HCPXmlConfig *_pluginXmlConfig;
     HCPApplicationConfig *_appConfig;
     HCPAppUpdateRequestAlertDialog *_appUpdateRequestDialog;
@@ -464,6 +465,11 @@ static NSString *const DEFAULT_STARTING_PAGE = @"index.html";
                            selector:@selector(onNothingToInstallEvent:)
                                name:kHCPNothingToInstallEvent
                              object:nil];
+
+    [notificationCenter addObserver:self
+                           selector:@selector(onDownloadProgressUpdate:)
+                               name:kHCPDownloadProgressEvent
+                             object:nil];
 }
 
 /**
@@ -550,6 +556,21 @@ static NSString *const DEFAULT_STARTING_PAGE = @"index.html";
     
     // probably never happens, but just for safety
     [self rollbackIfCorrupted:error];
+}
+
+-(void) onDownloadProgressUpdate:(NSNotification *)notification{
+    NSDictionary *progressInfo = notification.userInfo[kHCPEventUserInfoDataKey];
+    NSLog(@"download process: %@", [progressInfo description]);
+    
+    
+    // send notification to the associated callback
+    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:progressInfo];
+    
+    [pluginResult setKeepCallbackAsBool:YES];
+    if (_progressCallback) {
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:_progressCallback];
+        _downloadCallback = nil;
+    }
 }
 
 /**
@@ -843,6 +864,10 @@ static NSString *const DEFAULT_STARTING_PAGE = @"index.html";
 
     CDVPluginResult *result = [CDVPluginResult pluginResultWithActionName:nil data:data error:nil];
     [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+}
+
+- (void)jsDownloadProgress:(CDVInvokedUrlCommand *)command {
+    _progressCallback = command.callbackId;
 }
 
 - (void)sendPluginNotReadyToWorkMessageForEvent:(NSString *)eventName callbackID:(NSString *)callbackID {

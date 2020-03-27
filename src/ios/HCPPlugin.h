@@ -19,7 +19,7 @@
  *  Fetch update preferences. Used by default if none provided from JS side.
  *  Can be used to controll plugin's workflow from the native side.
  */
-@property (nonatomic, strong) HCPFetchUpdateOptions *defaultFetchUpdateOptions;
+@property(nonatomic, strong) HCPFetchUpdateOptions *defaultFetchUpdateOptions;
 
 #pragma mark Methods, invoked from JavaScript
 
@@ -73,4 +73,5 @@
  */
 - (void)jsGetVersionInfo:(CDVInvokedUrlCommand *)command;
 
+- (void)jsDownloadProgress:(CDVInvokedUrlCommand *)command;
 @end
