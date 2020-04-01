@@ -8,13 +8,15 @@
 #import "HCPManifestFile.h"
 #import "NSData+HCPMD5.h"
 #import "NSError+HCPExtension.h"
+#import "HCPEvents.h"
 
 @interface HCPFileDownloader()<NSURLSessionDownloadDelegate> {
     NSArray *_filesList;
     NSURL *_contentURL;
     NSURL *_folderURL;
     NSDictionary *_headers;
-    
+    HCPApplicationConfig * _newConfig;
+    NSString * _workerId;
     NSURLSession *_session;
     HCPFileDownloadCompletionBlock _complitionHandler;
     NSUInteger _downloadCounter;
@@ -52,7 +54,9 @@ static NSUInteger const TIMEOUT = 300;
     return [NSURLSession sessionWithConfiguration:configuration delegate:self delegateQueue:nil];
 }
 
-- (void)startDownloadWithCompletionBlock:(HCPFileDownloadCompletionBlock)block {
+- (void)startDownload:(HCPApplicationConfig*)config workerId:(NSString*) workerId CompletionBlock:(HCPFileDownloadCompletionBlock)block {
+    _newConfig = config;
+    _workerId = workerId;
     _complitionHandler = block;
     _downloadCounter = 0;
     _session = [self sessionWithHeaders:_headers];

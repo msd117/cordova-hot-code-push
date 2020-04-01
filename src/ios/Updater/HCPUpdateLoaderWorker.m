@@ -151,25 +151,26 @@
                                                                    srcDirURL:newAppConfig.contentConfig.contentURL
                                                                    dstDirURL:_pluginFiles.downloadFolder
                                                               requestHeaders:_requestHeaders];
-    [downloader startDownloadWithCompletionBlock:^(NSError * error) {
-        if (error) {
-            // remove new release folder
-            [[NSFileManager defaultManager] removeItemAtURL:_pluginFiles.contentFolder error:nil];
-            
-            // notify about the error
-            [self notifyWithError:[NSError errorWithCode:kHCPFailedToDownloadUpdateFilesErrorCode
-                                              descriptionFromError:error]
-                          applicationConfig:newAppConfig];
-            return;
-        }
-                  
-        // store configs
-        [_manifestStorage store:newManifest inFolder:_pluginFiles.downloadFolder];
-        [_appConfigStorage store:newAppConfig inFolder:_pluginFiles.downloadFolder];
-                  
-        // notify that we are done
-        [self notifyUpdateDownloadSuccess:newAppConfig];
+    [downloader startDownload:newAppConfig workerId:_workerId CompletionBlock:^(NSError *error) {
+         if (error) {
+                   // remove new release folder
+                   [[NSFileManager defaultManager] removeItemAtURL:_pluginFiles.contentFolder error:nil];
+                   
+                   // notify about the error
+                   [self notifyWithError:[NSError errorWithCode:kHCPFailedToDownloadUpdateFilesErrorCode
+                                                     descriptionFromError:error]
+                                 applicationConfig:newAppConfig];
+                   return;
+               }
+                         
+               // store configs
+               [_manifestStorage store:newManifest inFolder:_pluginFiles.downloadFolder];
+               [_appConfigStorage store:newAppConfig inFolder:_pluginFiles.downloadFolder];
+                         
+               // notify that we are done
+               [self notifyUpdateDownloadSuccess:newAppConfig];
     }];
+
 }
 
 - (HCPApplicationConfig *)getApplicationConfigFromData:(NSData *)data error:(NSError **)error {

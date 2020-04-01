@@ -36,6 +36,6 @@ typedef void (^HCPFileDownloadCompletionBlock)(NSError *error);
  * 
  * @param block complition block
  */
-- (void)startDownloadWithCompletionBlock:(HCPFileDownloadCompletionBlock)block;
+- (void)startDownload:(HCPApplicationConfig *)config workerId:(NSString *)workerId CompletionBlock:(HCPFileDownloadCompletionBlock)block;
 
 @end
