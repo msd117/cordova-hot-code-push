@@ -32,6 +32,10 @@
     NSString *_installationCallback;
     NSString *_downloadCallback;
     NSString * _progressCallback;
+    NSString* _nothingUpdateCallback;
+    NSString* _updateInstalledCallback;
+    NSString* _updateInstallFailedCallback;
+    NSString* _updateDownloadFailedCallback;
     HCPXmlConfig *_pluginXmlConfig;
     HCPApplicationConfig *_appConfig;
     HCPAppUpdateRequestAlertDialog *_appUpdateRequestDialog;
@@ -545,10 +549,10 @@ static NSString *const DEFAULT_STARTING_PAGE = @"index.html";
     
     // send notification to the associated callback
     CDVPluginResult *pluginResult = [CDVPluginResult pluginResultForNotification:notification];
-    if (_downloadCallback) {
+    if (_updateDownloadFailedCallback) {
+        [pluginResult setKeepCallbackAsBool:YES];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:_updateDownloadFailedCallback];
         
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:_downloadCallback];
-        _downloadCallback = nil;
     }
     
     // send notification to the default callback
@@ -567,10 +571,7 @@ static NSString *const DEFAULT_STARTING_PAGE = @"index.html";
     CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:progressInfo];
     
     [pluginResult setKeepCallbackAsBool:YES];
-    if (_progressCallback) {
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:_progressCallback];
-        _downloadCallback = nil;
-    }
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:_progressCallback];
 }
 
 /**
@@ -583,9 +584,9 @@ static NSString *const DEFAULT_STARTING_PAGE = @"index.html";
     
     // send notification to the associated callback
     CDVPluginResult *pluginResult = [CDVPluginResult pluginResultForNotification:notification];
-    if (_downloadCallback) {
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:_downloadCallback];
-        _downloadCallback = nil;
+    [pluginResult setKeepCallbackAsBool:YES];
+    if (_nothingUpdateCallback) {
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:_nothingUpdateCallback];
     }
     
     // send notification to the default callback
@@ -668,11 +669,10 @@ static NSString *const DEFAULT_STARTING_PAGE = @"index.html";
     [_pluginInternalPrefs saveToUserDefaults];
     
     CDVPluginResult *pluginResult = [CDVPluginResult pluginResultForNotification:notification];
-    
+    [pluginResult setKeepCallbackAsBool:YES];
     // send notification to the caller from the JavaScript side if there was any
-    if (_installationCallback) {
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:_installationCallback];
-        _installationCallback = nil;
+    if (_updateInstallFailedCallback) {
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:_updateInstallFailedCallback];
     }
     
     // send notification to the default callback
@@ -699,11 +699,10 @@ static NSString *const DEFAULT_STARTING_PAGE = @"index.html";
     _filesStructure = [[HCPFilesStructure alloc] initWithReleaseVersion:_pluginInternalPrefs.currentReleaseVersionName];
     
     CDVPluginResult *pluginResult = [CDVPluginResult pluginResultForNotification:notification];
-    
+    [pluginResult setKeepCallbackAsBool:YES];
     // send notification to the caller from the JavaScript side of there was any
-    if (_installationCallback) {
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:_installationCallback];
-        _installationCallback = nil;
+    if (_updateInstalledCallback) {
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:_updateInstalledCallback];
     }
     
     // send notification to the default callback
@@ -868,6 +867,32 @@ static NSString *const DEFAULT_STARTING_PAGE = @"index.html";
 
 - (void)jsDownloadProgress:(CDVInvokedUrlCommand *)command {
     _progressCallback = command.callbackId;
+}
+
+- (void)jsNothingUpdate:(CDVInvokedUrlCommand *)command {
+    _nothingUpdateCallback = command.callbackId;
+}
+
+
+/**
+ * 更新install完成
+ */
+- (void)jsUpdateInstalled:(CDVInvokedUrlCommand *)command{
+    _updateInstalledCallback = command.callbackId;
+}
+
+/**
+ * 更新install失败
+ */
+- (void)jsUpdateInstallFailed:(CDVInvokedUrlCommand *)command{
+    _updateInstallFailedCallback = command.callbackId;
+}
+
+/**
+ * 更新下载失败
+ */
+- (void)jsUpdateDownloadFailed:(CDVInvokedUrlCommand *)command{
+    _updateDownloadFailedCallback = command.callbackId;
 }
 
 - (void)sendPluginNotReadyToWorkMessageForEvent:(NSString *)eventName callbackID:(NSString *)callbackID {

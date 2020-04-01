@@ -1,7 +1,9 @@
 package com.nordnetab.chcp.main.network;
 
 import android.util.Log;
+import org.greenrobot.eventbus.EventBus;
 
+import com.nordnetab.chcp.main.events.UpdateDownloadProgressEvent;
 import com.nordnetab.chcp.main.model.ManifestFile;
 import com.nordnetab.chcp.main.utils.FilesUtility;
 import com.nordnetab.chcp.main.utils.MD5;
@@ -29,23 +31,30 @@ import java.util.Map;
 public class FileDownloader {
 
     /**
-     * Download list of files.
-     * Full url to the file is constructed from the contentFolderUrl and ManifestFile#hash (relative path).
-     * For each downloaded file we perform check of his hash. If it is different from the one, that provided
-     * if ManifestFile#hash - exception will be thrown.
-     * Download stops on any error.
+     * Download list of files. Full url to the file is constructed from the
+     * contentFolderUrl and ManifestFile#hash (relative path). For each downloaded
+     * file we perform check of his hash. If it is different from the one, that
+     * provided if ManifestFile#hash - exception will be thrown. Download stops on
+     * any error.
      *
-     * @param downloadFolder   absolute path to the folder, where downloaded files should be placed
+     * @param downloadFolder   absolute path to the folder, where downloaded files
+     *                         should be placed
      * @param contentFolderUrl root url on the server, where all files are located
      * @param files            list of files to download
      * @throws Exception
      * @see ManifestFile
      */
-    public static void downloadFiles(final String downloadFolder,
-                                     final String contentFolderUrl,
-                                     final List<ManifestFile> files,
-                                     final Map<String, String> requestHeaders) throws Exception {
-        for (ManifestFile file : files) {
+    public static void downloadFiles(final String downloadFolder, final String contentFolderUrl,
+            final List<ManifestFile> files, final Map<String, String> requestHeaders) throws Exception {
+        Integer total = files.size();
+        for (int current = 0; current < total; current++) {
+            // 下载前通知当前下载到哪儿了
+            UpdateDownloadProgressEvent event = new UpdateDownloadProgressEvent();
+            event.data().put("total", total);
+            event.data().put("current", current);
+
+            EventBus.getDefault().post(event);
+            ManifestFile file = files.get(current);
             String fileUrl = URLUtility.construct(contentFolderUrl, file.name);
             String filePath = Paths.get(downloadFolder, file.name);
             download(fileUrl, filePath, file.hash, requestHeaders);
@@ -60,13 +69,11 @@ public class FileDownloader {
      * @param checkSum checksum of the file
      * @throws IOException
      */
-    public static void download(final String urlFrom,
-                                final String filePath,
-                                final String checkSum,
-                                final Map<String, String> requestHeaders) throws Exception {
+    public static void download(final String urlFrom, final String filePath, final String checkSum,
+            final Map<String, String> requestHeaders) throws Exception {
         Log.d("CHCP", "Loading file: " + urlFrom);
         final MD5 md5 = new MD5();
-
+        // 发出通知
         final File downloadFile = new File(filePath);
         FilesUtility.delete(downloadFile);
         FilesUtility.ensureDirectoryExists(downloadFile.getParentFile());
@@ -86,10 +93,11 @@ public class FileDownloader {
         output.flush();
         output.close();
         input.close();
-
+        // 发出通知
         final String downloadedFileHash = md5.calculateHash();
         if (!downloadedFileHash.equals(checkSum)) {
-            throw new IOException("File is corrupted: checksum " + checkSum + " doesn't match hash " + downloadedFileHash + " of the downloaded file");
+            throw new IOException("File is corrupted: checksum " + checkSum + " doesn't match hash "
+                    + downloadedFileHash + " of the downloaded file");
         }
     }
 }

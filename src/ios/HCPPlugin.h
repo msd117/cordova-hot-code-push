@@ -73,5 +73,28 @@
  */
 - (void)jsGetVersionInfo:(CDVInvokedUrlCommand *)command;
 
+/**
+ * 更新下载
+ */
 - (void)jsDownloadProgress:(CDVInvokedUrlCommand *)command;
+
+/**
+ * 无需更新
+ */
+- (void)jsNothingUpdate:(CDVInvokedUrlCommand *)command;
+
+/**
+ * 更新install完成
+ */
+- (void)jsUpdateInstalled:(CDVInvokedUrlCommand *)command;
+
+/**
+ * 更新install失败
+ */
+- (void)jsUpdateInstallFailed:(CDVInvokedUrlCommand *)command;
+
+/**
+ * 更新下载失败
+ */
+- (void)jsUpdateDownloadFailed:(CDVInvokedUrlCommand *)command;
 @end

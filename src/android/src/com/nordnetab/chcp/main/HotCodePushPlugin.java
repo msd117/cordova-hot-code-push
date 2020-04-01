@@ -17,6 +17,7 @@ import com.nordnetab.chcp.main.events.BeforeInstallEvent;
 import com.nordnetab.chcp.main.events.NothingToInstallEvent;
 import com.nordnetab.chcp.main.events.NothingToUpdateEvent;
 import com.nordnetab.chcp.main.events.UpdateDownloadErrorEvent;
+import com.nordnetab.chcp.main.events.UpdateDownloadProgressEvent;
 import com.nordnetab.chcp.main.events.UpdateInstallationErrorEvent;
 import com.nordnetab.chcp.main.events.UpdateInstalledEvent;
 import com.nordnetab.chcp.main.events.UpdateIsReadyToInstallEvent;
@@ -78,6 +79,11 @@ public class HotCodePushPlugin extends CordovaPlugin {
     private CallbackContext installJsCallback;
     private CallbackContext jsDefaultCallback;
     private CallbackContext downloadJsCallback;
+    private CallbackContext downloadProgressJsCallback;
+    private CallbackContext nothingUpdateJsCallback;
+    private CallbackContext updateInstalledJsCallback;
+    private CallbackContext updateDownloadFailedJsCallback;
+    private CallbackContext updateInstallFailedJsCallback;
 
     private Handler handler;
     private boolean isPluginReadyForWork;
@@ -239,22 +245,43 @@ public class HotCodePushPlugin extends CordovaPlugin {
     @Override
     public boolean execute(String action, CordovaArgs args, CallbackContext callbackContext) throws JSONException {
         boolean cmdProcessed = true;
-        if (JSAction.INIT.equals(action)) {
-            jsInit(callbackContext);
-        } else if (JSAction.FETCH_UPDATE.equals(action)) {
-            jsFetchUpdate(callbackContext, args);
-        } else if (JSAction.INSTALL_UPDATE.equals(action)) {
-            jsInstallUpdate(callbackContext);
-        } else if (JSAction.CONFIGURE.equals(action)) {
-            jsSetPluginOptions(args, callbackContext);
-        } else if (JSAction.REQUEST_APP_UPDATE.equals(action)) {
-            jsRequestAppUpdate(args, callbackContext);
-        } else if (JSAction.IS_UPDATE_AVAILABLE_FOR_INSTALLATION.equals(action)) {
-            jsIsUpdateAvailableForInstallation(callbackContext);
-        } else if (JSAction.GET_VERSION_INFO.equals(action)) {
-            jsGetVersionInfo(callbackContext);
-        } else {
-            cmdProcessed = false;
+        switch (action) {
+            case JSAction.INIT:
+                jsInit(callbackContext);
+                break;
+            case JSAction.FETCH_UPDATE:
+                jsFetchUpdate(callbackContext, args);
+                break;
+            case JSAction.INSTALL_UPDATE:
+                jsInstallUpdate(callbackContext);
+                break;
+            case JSAction.CONFIGURE:
+                jsSetPluginOptions(args, callbackContext);
+                break;
+            case JSAction.REQUEST_APP_UPDATE:
+                jsRequestAppUpdate(args, callbackContext);
+                break;
+            case JSAction.IS_UPDATE_AVAILABLE_FOR_INSTALLATION:
+                jsIsUpdateAvailableForInstallation(callbackContext);
+                break;
+            case JSAction.GET_VERSION_INFO:
+                jsGetVersionInfo(callbackContext);
+                break;
+            case JSAction.UPDATE_DOWNLOAD_FAILED:
+                updateDownloadFailedJsCallback = callbackContext;
+                break;
+            case JSAction.UPDATE_INSTALLED:
+                updateInstalledJsCallback = callbackContext;
+                break;
+            case JSAction.DOWNLOAD_PROGRESS:
+                downloadProgressJsCallback = callbackContext;
+                break;
+            case JSAction.UPDATE_INSTALL_FAILED:
+                updateInstallFailedJsCallback = callbackContext;
+                break;
+            default:
+                cmdProcessed = false;
+                break;
         }
 
         return cmdProcessed;
@@ -280,6 +307,15 @@ public class HotCodePushPlugin extends CordovaPlugin {
         jsDefaultCallback.sendPluginResult(message);
 
         return true;
+    }
+
+    private boolean sendMessageToCallback(final PluginResult message, CallbackContext callback) {
+        if (callback) {
+            message.setKeepCallback(true);
+            callback.sendPluginResult(message);
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -462,6 +498,12 @@ public class HotCodePushPlugin extends CordovaPlugin {
         data.put("appVersion", VersionHelper.applicationVersionName(context));
         data.put("buildVersion", VersionHelper.applicationVersionCode(context));
 
+        final PluginResult pluginResult = PluginResultHelper.createPluginResult(null, data, null);
+        callback.sendPluginResult(pluginResult);
+    }
+
+    private void eventNotify(final CallbackContext callback, final Map<String, Object> data) {
+        final Context context = cordova.getActivity();
         final PluginResult pluginResult = PluginResultHelper.createPluginResult(null, data, null);
         callback.sendPluginResult(pluginResult);
     }
@@ -690,6 +732,15 @@ public class HotCodePushPlugin extends CordovaPlugin {
         sendMessageToDefaultCallback(result);
     }
 
+    @SuppressWarnings("unused")
+    @Subscribe
+    public void onEvent(final UpdateDownloadProgressEvent event) {
+        Log.d("CHCP", "下载进度:", event.data().toString());
+        final PluginResult result = PluginResultHelper.pluginResultFromEvent(event);
+
+        sendMessageToDefaultCallback(result);
+    }
+
     /**
      * Listener for event that assets folder are now installed on the external
      * storage. From that moment all content will be displayed from it.
@@ -788,14 +839,7 @@ public class HotCodePushPlugin extends CordovaPlugin {
         Log.d("CHCP", "Nothing to update");
 
         PluginResult jsResult = PluginResultHelper.pluginResultFromEvent(event);
-
-        // notify JS
-        if (downloadJsCallback != null) {
-            downloadJsCallback.sendPluginResult(jsResult);
-            downloadJsCallback = null;
-        }
-
-        sendMessageToDefaultCallback(jsResult);
+        sendMessageToCallback(jsResult, nothingUpdateJsCallback);
     }
 
     /**
@@ -879,12 +923,7 @@ public class HotCodePushPlugin extends CordovaPlugin {
 
         final PluginResult jsResult = PluginResultHelper.pluginResultFromEvent(event);
 
-        if (installJsCallback != null) {
-            installJsCallback.sendPluginResult(jsResult);
-            installJsCallback = null;
-        }
-
-        sendMessageToDefaultCallback(jsResult);
+        sendMessageToCallback(jsResult, updateInstalledJsCallback);
 
         // reset content to index page
         handler.post(new Runnable() {
@@ -912,13 +951,7 @@ public class HotCodePushPlugin extends CordovaPlugin {
 
         PluginResult jsResult = PluginResultHelper.pluginResultFromEvent(event);
 
-        // notify js
-        if (installJsCallback != null) {
-            installJsCallback.sendPluginResult(jsResult);
-            installJsCallback = null;
-        }
-
-        sendMessageToDefaultCallback(jsResult);
+        sendMessageToCallback(jsResult, updateInstallFailedJsCallback);
 
         rollbackIfCorrupted(event.error());
     }
