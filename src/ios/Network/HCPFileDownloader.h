@@ -5,7 +5,7 @@
 //
 
 #import <Foundation/Foundation.h>
-
+#import "HCPApplicationConfig.h"
 /**
  *  Complition block for file download process.
  *
