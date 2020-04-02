@@ -195,11 +195,12 @@ function broadcastEventFromNative(nativeMessage) {
   var chcpEvent = new CustomEvent(nativeMessage.action, {
     detail: params
   })
-  document.dispatchEvent(chcpEvent)
-  // cordova.fireDocumentEvent(nativeMessage.action, {
-  //   data: nativeMessage.data,
-  //   error: nativeMessage.error
-  // })
+  // document.dispatchEvent(chcpEvent)
+  // 使用fireDocumentEvent可以带参数
+  cordova.fireDocumentEvent(nativeMessage.action, {
+    data: nativeMessage.data,
+    error: nativeMessage.error
+  })
 }
 
 // endregion
