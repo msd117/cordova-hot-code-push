@@ -564,13 +564,16 @@ static NSString *const DEFAULT_STARTING_PAGE = @"index.html";
 -(void) onDownloadProgressUpdate:(NSNotification *)notification{
     NSDictionary *progressInfo = notification.userInfo[kHCPEventUserInfoDataKey];
     NSLog(@"download process: %@", [progressInfo description]);
-    
-    
+
     // send notification to the associated callback
-    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:progressInfo];
-    
-    [pluginResult setKeepCallbackAsBool:YES];
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:_progressCallback];
+    CDVPluginResult *pluginResult = [CDVPluginResult pluginResultForNotification:notification];
+    if(_progressCallback){
+        
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:_progressCallback];
+        _progressCallback = nil;
+    }
+        [self invokeDefaultCallbackWithMessage:pluginResult];
+  
 }
 
 /**
