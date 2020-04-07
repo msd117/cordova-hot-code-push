@@ -310,7 +310,7 @@ public class HotCodePushPlugin extends CordovaPlugin {
     }
 
     private boolean sendMessageToCallback(final PluginResult message, CallbackContext callback) {
-        if (callback) {
+        if (callback != null) {
             message.setKeepCallback(true);
             callback.sendPluginResult(message);
             return true;
@@ -735,7 +735,7 @@ public class HotCodePushPlugin extends CordovaPlugin {
     @SuppressWarnings("unused")
     @Subscribe
     public void onEvent(final UpdateDownloadProgressEvent event) {
-        Log.d("CHCP", "下载进度:", event.data().toString());
+        Log.d("CHCP", "下载进度:" + event.data());
         final PluginResult result = PluginResultHelper.pluginResultFromEvent(event);
 
         sendMessageToDefaultCallback(result);
