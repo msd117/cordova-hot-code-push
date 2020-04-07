@@ -79,11 +79,6 @@ public class HotCodePushPlugin extends CordovaPlugin {
     private CallbackContext installJsCallback;
     private CallbackContext jsDefaultCallback;
     private CallbackContext downloadJsCallback;
-    private CallbackContext downloadProgressJsCallback;
-    private CallbackContext nothingUpdateJsCallback;
-    private CallbackContext updateInstalledJsCallback;
-    private CallbackContext updateDownloadFailedJsCallback;
-    private CallbackContext updateInstallFailedJsCallback;
 
     private Handler handler;
     private boolean isPluginReadyForWork;
@@ -267,18 +262,6 @@ public class HotCodePushPlugin extends CordovaPlugin {
             case JSAction.GET_VERSION_INFO:
                 jsGetVersionInfo(callbackContext);
                 break;
-            case JSAction.UPDATE_DOWNLOAD_FAILED:
-                updateDownloadFailedJsCallback = callbackContext;
-                break;
-            case JSAction.UPDATE_INSTALLED:
-                updateInstalledJsCallback = callbackContext;
-                break;
-            case JSAction.DOWNLOAD_PROGRESS:
-                downloadProgressJsCallback = callbackContext;
-                break;
-            case JSAction.UPDATE_INSTALL_FAILED:
-                updateInstallFailedJsCallback = callbackContext;
-                break;
             default:
                 cmdProcessed = false;
                 break;
@@ -307,15 +290,6 @@ public class HotCodePushPlugin extends CordovaPlugin {
         jsDefaultCallback.sendPluginResult(message);
 
         return true;
-    }
-
-    private boolean sendMessageToCallback(final PluginResult message, CallbackContext callback) {
-        if (callback != null) {
-            message.setKeepCallback(true);
-            callback.sendPluginResult(message);
-            return true;
-        }
-        return false;
     }
 
     /**
@@ -737,7 +711,6 @@ public class HotCodePushPlugin extends CordovaPlugin {
     public void onEvent(final UpdateDownloadProgressEvent event) {
         Log.d("CHCP", "下载进度:" + event.data());
         final PluginResult result = PluginResultHelper.pluginResultFromEvent(event);
-
         sendMessageToDefaultCallback(result);
     }
 
@@ -839,7 +812,7 @@ public class HotCodePushPlugin extends CordovaPlugin {
         Log.d("CHCP", "Nothing to update");
 
         PluginResult jsResult = PluginResultHelper.pluginResultFromEvent(event);
-        sendMessageToCallback(jsResult, nothingUpdateJsCallback);
+        sendMessageToDefaultCallback(jsResult);
     }
 
     /**
@@ -923,7 +896,7 @@ public class HotCodePushPlugin extends CordovaPlugin {
 
         final PluginResult jsResult = PluginResultHelper.pluginResultFromEvent(event);
 
-        sendMessageToCallback(jsResult, updateInstalledJsCallback);
+        sendMessageToDefaultCallback(jsResult);
 
         // reset content to index page
         handler.post(new Runnable() {
@@ -951,8 +924,7 @@ public class HotCodePushPlugin extends CordovaPlugin {
 
         PluginResult jsResult = PluginResultHelper.pluginResultFromEvent(event);
 
-        sendMessageToCallback(jsResult, updateInstallFailedJsCallback);
-
+        sendMessageToDefaultCallback(jsResult);
         rollbackIfCorrupted(event.error());
     }
 
