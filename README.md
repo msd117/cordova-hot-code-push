@@ -1,6 +1,30 @@
+# This is A fork project
+
+该项目是 fork 自[nordnet](https://github.com/nordnet)的[cordova-hot-code-push](https://github.com/nordnet/cordova-hot-code-push)项目，原项目已经不再维护了。
+本项目是站在前人的基础上做了一些修改，兼容了 ionic3 至 ionic4
+
+## Supported platforms
+
+- Android 5.1.2 or above.
+- iOS 10.0 or above. Xcode 7+ is required.
+
+## Installation
+
+This requires cordova 5.0+ (current stable 1.5.3)
+
+```sh
+cordova plugin add teh-hot-code-push-plugin
+```
+
+It is also possible to install via repo url directly (**unstable**)
+
+```sh
+cordova plugin add https://github.com/amosbaby/cordova-hot-code-push.git
+```
+
 # THIS PROJECT IS DEPRECATED
 
-We are not using this repo anymore, and we lack the manpower and the experience needed to maintain it. We are aware of the inconveniece that this may cause you. Feel free to use it as is, or create your own fork. See https://github.com/nordnet/cordova-hot-code-push/issues/371 for more information.
+We are not using this repo anymore, and we lack the manpower and the experience needed to maintain it. We are aware of the inconveniece that this may cause you. Feel free to use it as is, or create your own fork. See https://github.com/amosbaby/cordova-hot-code-pushissues/371 for more information.
 
 # Cordova Hot Code Push Plugin
 
@@ -30,12 +54,14 @@ This requires cordova 5.0+ (current stable 1.5.3)
 cordova plugin add teh-hot-code-push-plugin
 ```
 
-It is also possible to install via repo url directly (__unstable__)
+It is also possible to install via repo url directly (**unstable**)
+
 ```sh
-cordova plugin add https://github.com/nordnet/cordova-hot-code-push.git
+cordova plugin add https://github.com/amosbaby/cordova-hot-code-push.git
 ```
 
 At the end of the installation plugin will recommend you to install [Cordova Hot Code Push CLI client](https://github.com/nordnet/cordova-hot-code-push-cli). This client will help you to:
+
 - easily generate necessary configuration files;
 - launch local server to listen for any changes in the web project and deploy new version immediately on the app.
 
@@ -43,66 +69,68 @@ Of course, you can use this plugin without the CLI client, but it will make your
 
 ### Quick start guide
 
-In this guide we will show how quickly you can test this plugin and start using it for development. For that we will install [development add-on](https://github.com/nordnet/cordova-hot-code-push/wiki/Local-Development-Plugin).
+In this guide we will show how quickly you can test this plugin and start using it for development. For that we will install [development add-on](https://github.com/amosbaby/cordova-hot-code-pushwiki/Local-Development-Plugin).
 
 1. Create new Cordova project using command line interface and add iOS/Android platforms:
 
-  ```sh
-  cordova create TestProject com.example.testproject TestProject
-  cd ./TestProject
-  cordova platform add android
-  cordova platform add ios
-  ```
-  Or use the existing one.
+```sh
+cordova create TestProject com.example.testproject TestProject
+cd ./TestProject
+cordova platform add android
+cordova platform add ios
+```
+
+Or use the existing one.
 
 2. Add plugin:
 
-  ```sh
-  cordova plugin add teh-hot-code-push-plugin
-  ```
+```sh
+cordova plugin add teh-hot-code-push-plugin
+```
 
 3. Add plugin for local development:
 
-  ```sh
-  cordova plugin add cordova-hot-code-push-local-dev-addon
-  ```
+```sh
+cordova plugin add cordova-hot-code-push-local-dev-addon
+```
 
 4. Install Cordova Hot Code Push CLI client:
 
-  ```sh
-  npm install -g cordova-hot-code-push-cli
-  ```
+```sh
+npm install -g cordova-hot-code-push-cli
+```
 
 5. Start local server by executing:
 
-  ```sh
-  cordova-hcp server
-  ```
+```sh
+cordova-hcp server
+```
 
-  As a result you will see something like this:
-  ```
-  Running server
-  Checking:  /Cordova/TestProject/www
-  local_url http://localhost:31284
-  Warning: .chcpignore does not exist.
-  Build 2015.09.02-10.17.48 created in /Cordova/TestProject/www
-  cordova-hcp local server available at: http://localhost:31284
-  cordova-hcp public server available at: https://5027caf9.ngrok.com
-  ```
+As a result you will see something like this:
+
+```
+Running server
+Checking:  /Cordova/TestProject/www
+local_url http://localhost:31284
+Warning: .chcpignore does not exist.
+Build 2015.09.02-10.17.48 created in /Cordova/TestProject/www
+cordova-hcp local server available at: http://localhost:31284
+cordova-hcp public server available at: https://5027caf9.ngrok.com
+```
 
 6. Open new console window, go to the project root and launch the app:
 
-  ```sh
-  cordova run
-  ```
+```sh
+cordova run
+```
 
-  Wait until application is launched for both platforms.
+Wait until application is launched for both platforms.
 
 7. Now open your `index.html` page in `www` folder of the `TestProject`, change something in it and save. In a few seconds you will see updated page on the launched devices (emulators).
 
 From this point you can do local development, where all the changes are uploaded on the devices without the need to restart applications on every change you made.
 
-For production build do not forget to add the following to your `config.xml` file as it is a required property. Checkout the [wiki](https://github.com/nordnet/cordova-hot-code-push/wiki/Cordova-config-preferences) for more information:
+For production build do not forget to add the following to your `config.xml` file as it is a required property. Checkout the [wiki](https://github.com/amosbaby/cordova-hot-code-pushwiki/Cordova-config-preferences) for more information:
 
 ```xml
 <chcp>
@@ -112,6 +140,6 @@ For production build do not forget to add the following to your `config.xml` fil
 
 ### Documentation
 
-All documentation can be found in details in our [Wiki on GitHub](https://github.com/nordnet/cordova-hot-code-push/wiki).
+All documentation can be found in details in our [Wiki on GitHub](https://github.com/amosbaby/cordova-hot-code-pushwiki).
 
-If you have some questions/problems/suggestions - don't hesitate to post a [thread](https://github.com/nordnet/cordova-hot-code-push/issues). If it's an actual issue - please, follow [this guide](https://github.com/nordnet/cordova-hot-code-push/wiki/Issue-creation-guide) on how to do that properly.
+If you have some questions/problems/suggestions - don't hesitate to post a [thread](https://github.com/amosbaby/cordova-hot-code-pushissues). If it's an actual issue - please, follow [this guide](https://github.com/amosbaby/cordova-hot-code-pushwiki/Issue-creation-guide) on how to do that properly.

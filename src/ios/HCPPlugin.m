@@ -712,12 +712,9 @@ static NSString *const DEFAULT_STARTING_PAGE = @"index.html";
     // send notification to the default callback
     [self invokeDefaultCallbackWithMessage:pluginResult];
 
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
      // 热更新下载完毕时需要切换一下服务根目录
     [self switchServerBaseToExternalPath];
-    // reload application to the index page
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        // reload application to the index page
-    [self loadURL:[self indexPageFromConfigXml]];
 
     });
     
