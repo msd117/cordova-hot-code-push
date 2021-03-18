@@ -7,6 +7,7 @@
 #import <Cordova/CDVPlugin.h>
 #import <Cordova/CDV.h>
 #import "HCPFetchUpdateOptions.h"
+#import "HCPInstallOptions.h"
 
 /**
  *  Plugin main class

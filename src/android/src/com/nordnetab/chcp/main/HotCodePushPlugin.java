@@ -81,7 +81,7 @@ public class HotCodePushPlugin extends CordovaPlugin {
     private CallbackContext jsDefaultCallback;
     private CallbackContext downloadJsCallback;
 
-    private HcpInstallOptions installOptions;
+    private boolean shouldReloadAfterInstall;
 
     private Handler handler;
     private boolean isPluginReadyForWork;
@@ -365,16 +365,16 @@ public class HotCodePushPlugin extends CordovaPlugin {
      *
      * @param callback js callback
      */
-    private void jsInstallUpdate(CallbackContext callback) {
+    private void jsInstallUpdate(CallbackContext callback,CordovaArgs args) {
         if (!isPluginReadyForWork) {
             sendPluginNotReadyToWork(UpdateInstallationErrorEvent.EVENT_NAME, callback);
             return;
         }
 
-          HcpInstallOptions installOptions = null;
+        HcpInstallOptions installOptions = null;
         try {
             installOptions = new HcpInstallOptions(args.optJSONObject(0));
-            this.installOptions = installOptions;
+            this.shouldReloadAfterInstall = installOptions.shouldReload();
         } catch (JSONException ignored) {
         }
 
@@ -911,14 +911,18 @@ public class HotCodePushPlugin extends CordovaPlugin {
 
         sendMessageToDefaultCallback(jsResult);
 
-        // reset content to index page
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                HotCodePushPlugin.this.redirectToLocalStorageIndexPage();
-            }
-        });
+        if(this.shouldReloadAfterInstall){
 
+            // reset content to index page
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    HotCodePushPlugin.this.redirectToLocalStorageIndexPage();
+                }
+            });
+        }else{
+            Log.println( Log.DEBUG,"update install complete","安装完成下次启动将使用该目录");
+        }
         cleanupFileSystemFromOldReleases();
     }
 

@@ -41,6 +41,7 @@
     HCPAppUpdateRequestAlertDialog *_appUpdateRequestDialog;
     NSString *_indexPage;
     NSMutableArray<CDVPluginResult *> *_defaultCallbackStoredResults;
+    BOOL _shouldReload;
 }
 
 @end
@@ -111,9 +112,6 @@ static NSString *const DEFAULT_STARTING_PAGE = @"index.html";
         _pluginInternalPrefs.currentReleaseVersionName = config.contentConfig.releaseVersion;
         
         [_pluginInternalPrefs saveToUserDefaults];
-        // 此处需要更新，否则拷贝资源文件到热更新目录时会错误的拷贝到上一次的目录中
-         _filesStructure = [[HCPFilesStructure alloc] initWithReleaseVersion:_pluginInternalPrefs.currentReleaseVersionName];
-
     }
     
     [HCPAssetsFolderHelper installWwwFolderToExternalStorageFolder:_filesStructure.wwwFolder];
@@ -714,12 +712,18 @@ static NSString *const DEFAULT_STARTING_PAGE = @"index.html";
     
     // send notification to the default callback
     [self invokeDefaultCallbackWithMessage:pluginResult];
+    
+    if(_shouldReload){
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+         // 热更新下载完毕时需要切换一下服务根目录
+        [self switchServerBaseToExternalPath];
 
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-     // 热更新下载完毕时需要切换一下服务根目录
-    [self switchServerBaseToExternalPath];
-
-    });
+        });
+    }else{
+        NSLog(@"热更新安装完毕，下次启动时将从新的目录启动");
+    }
+    
+  
     
     [self cleanupFileSystemFromOldReleases];
 }
@@ -814,10 +818,13 @@ static NSString *const DEFAULT_STARTING_PAGE = @"index.html";
 }
 
 - (void)jsInstallUpdate:(CDVInvokedUrlCommand *)command {
+    NSDictionary *optionsFromJS = command.arguments.count ? command.arguments[0] : nil;
+    HCPInstallOptions * options = [[HCPInstallOptions alloc] initWithDictionary:optionsFromJS];
     if (!_isPluginReadyForWork) {
         [self sendPluginNotReadyToWorkMessageForEvent:kHCPUpdateInstallationErrorEvent callbackID:command.callbackId];
         return;
     }
+    _shouldReload =options.reload;
     
     [self _installUpdate:command.callbackId];
 }
