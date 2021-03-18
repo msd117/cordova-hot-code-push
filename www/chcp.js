@@ -327,8 +327,8 @@ var chcp = {
    *
    * @param {Callback(error)} callback - called when native side finishes installation process
    */
-  installUpdate: function(callback) {
-    callNativeMethod(pluginNativeMethod.INSTALL_UPDATE, null, callback)
+  installUpdate: function(callback,options) {
+    callNativeMethod(pluginNativeMethod.INSTALL_UPDATE, options, callback)
   },
 
   /**

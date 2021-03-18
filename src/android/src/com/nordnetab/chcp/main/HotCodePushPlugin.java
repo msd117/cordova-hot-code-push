@@ -9,6 +9,7 @@ import com.nordnetab.chcp.main.config.ApplicationConfig;
 import com.nordnetab.chcp.main.config.ChcpXmlConfig;
 import com.nordnetab.chcp.main.config.ContentConfig;
 import com.nordnetab.chcp.main.config.FetchUpdateOptions;
+import com.nordnetab.chcp.main.config.HcpInstallOptions;
 import com.nordnetab.chcp.main.config.PluginInternalPreferences;
 import com.nordnetab.chcp.main.events.AssetsInstallationErrorEvent;
 import com.nordnetab.chcp.main.events.AssetsInstalledEvent;
@@ -79,6 +80,8 @@ public class HotCodePushPlugin extends CordovaPlugin {
     private CallbackContext installJsCallback;
     private CallbackContext jsDefaultCallback;
     private CallbackContext downloadJsCallback;
+
+    private HcpInstallOptions installOptions;
 
     private Handler handler;
     private boolean isPluginReadyForWork;
@@ -248,7 +251,7 @@ public class HotCodePushPlugin extends CordovaPlugin {
                 jsFetchUpdate(callbackContext, args);
                 break;
             case JSAction.INSTALL_UPDATE:
-                jsInstallUpdate(callbackContext);
+                jsInstallUpdate(callbackContext,args);
                 break;
             case JSAction.CONFIGURE:
                 jsSetPluginOptions(args, callbackContext);
@@ -366,6 +369,13 @@ public class HotCodePushPlugin extends CordovaPlugin {
         if (!isPluginReadyForWork) {
             sendPluginNotReadyToWork(UpdateInstallationErrorEvent.EVENT_NAME, callback);
             return;
+        }
+
+          HcpInstallOptions installOptions = null;
+        try {
+            installOptions = new HcpInstallOptions(args.optJSONObject(0));
+            this.installOptions = installOptions;
+        } catch (JSONException ignored) {
         }
 
         installUpdate(callback);
