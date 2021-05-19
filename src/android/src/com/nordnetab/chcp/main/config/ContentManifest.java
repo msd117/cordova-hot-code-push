@@ -11,7 +11,9 @@ import com.nordnetab.chcp.main.model.ManifestDiff;
 import com.nordnetab.chcp.main.model.ManifestFile;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Nikolay Demyankov on 22.07.15.
