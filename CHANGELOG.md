@@ -1,5 +1,9 @@
 # Change Log
 
+## 1.2.5 (2021-06-02)
+
+如果没有传reload参数，则默认需要reload
+
 ## 1.2.4 (2021-05-19)
 
 优化热更新 manifest 文件比较算法，从 8 秒到 23 毫秒(在 android 设备体现比较明显)
@@ -38,6 +42,6 @@
 
 inappbrowser 需要用 3.0 以上，目前还是有问题，需要搭配
 
-> https://github.com/kleeb/cordova-plugin-inappbrowser
+> <https://github.com/kleeb/cordova-plugin-inappbrowser>
 
 百度地图也会报错，需要将 cordova-plugin-baidumaplocation 升级到 4.0.3

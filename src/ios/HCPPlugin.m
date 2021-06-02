@@ -820,7 +820,7 @@ static NSString *const DEFAULT_STARTING_PAGE = @"index.html";
 - (void)jsInstallUpdate:(CDVInvokedUrlCommand *)command {
        NSDictionary *optionsFromJS = command.arguments.count ? command.arguments[0] : nil;
     NSLog(@"jsInstallUpdate安装提示:%@",optionsFromJS);
-    _shouldReload = false;
+    _shouldReload = true;
     if(optionsFromJS != nil && optionsFromJS != [NSNull null]){
         HCPInstallOptions * options = [[HCPInstallOptions alloc] initWithDictionary:optionsFromJS];
         _shouldReload =options.reload;
