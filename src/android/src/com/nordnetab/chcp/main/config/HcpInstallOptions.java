@@ -14,7 +14,7 @@ public class HcpInstallOptions {
         if (json == null) {
             throw new JSONException("Can't parse null json object");
         }
-        this.reload = json.optBoolean(ARG_RELOAD,false) ;
+        this.reload = json.optBoolean(ARG_RELOAD,true) ;
     }
 
     public boolean  shouldReload(){
