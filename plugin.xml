@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<plugin id="cordova-hot-code-push-plugin" version="1.5.3" 
-  xmlns="http://apache.org/cordova/ns/plugins/1.0" 
+<plugin id="cordova-hot-code-push-plugin-renew" version="1.5.9"
+  xmlns="http://apache.org/cordova/ns/plugins/1.0"
   xmlns:android="http://schemas.android.com/apk/res/android">
   <name>Hot Code Push Plugin</name>
   <description>Cordova plugin to perform code updates on the fly</description>
   <license>MIT</license>
   <keywords>cordova,code,update</keywords>
-  <repo>https://github.com/nordnet/cordova-hot-code-push</repo>
-  <issue>https://github.com/nordnet/cordova-hot-code-push/issues</issue>
+  <repo>https://github.com/snipking/cordova-hot-code-push</repo>
+  <issue>https://github.com/snipking/cordova-hot-code-push/issues</issue>
   <engines>
     <engine name="cordova-ios" version=">=3.8"></engine>
     <engine name="cordova-android" version=">=4"></engine>
@@ -156,6 +156,9 @@
     <source-file src="src/android/src/com/nordnetab/chcp/main/events/UpdateInstalledEvent.java" target-dir="src/com/nordnetab/chcp/main/events"/>
     <source-file src="src/android/src/com/nordnetab/chcp/main/events/UpdateIsReadyToInstallEvent.java" target-dir="src/com/nordnetab/chcp/main/events"/>
     <source-file src="src/android/src/com/nordnetab/chcp/main/events/WorkerEvent.java" target-dir="src/com/nordnetab/chcp/main/events"/>
+    <source-file src="src/android/src/com/nordnetab/chcp/main/events/ManifestDiffCompleteEvent.java" target-dir="src/com/nordnetab/chcp/main/events"/>
+    <source-file src="src/android/src/com/nordnetab/chcp/main/events/UpdateDownloadProgressEvent.java" target-dir="src/com/nordnetab/chcp/main/events"/>
+    <source-file src="src/android/src/com/nordnetab/chcp/main/events/UpdateInstallProgressEvent.java" target-dir="src/com/nordnetab/chcp/main/events"/>
     <!-- sources for package: com.nordnetab.chcp.network -->
     <source-file src="src/android/src/com/nordnetab/chcp/main/network/ApplicationConfigDownloader.java" target-dir="src/com/nordnetab/chcp/main/network"/>
     <source-file src="src/android/src/com/nordnetab/chcp/main/network/ContentManifestDownloader.java" target-dir="src/com/nordnetab/chcp/main/network"/>

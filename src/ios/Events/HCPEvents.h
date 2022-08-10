@@ -59,6 +59,21 @@ extern NSString *const kHCPBundleAssetsInstalledOnExternalStorageEvent;
 extern NSString *const kHCPBundleAssetsInstallationErrorEvent;
 
 /**
+ *  Event is dispatched when content manifest diff complete, with diff data.
+ */
+extern NSString *const kHCPManifestDiffCompleteEvent;
+
+/**
+ *  Event is dispatched when every single update file downloaded complete from server.
+ */
+extern NSString *const kHCPUpdateDownloadProgressEvent;
+
+/**
+ *  Event is dispatched when every single update file installed complete.
+ */
+extern NSString *const kHCPUpdateInstallProgressEvent;
+
+/**
  *  Key for error object in the user info dictionary that is attached to the event.
  */
 extern NSString *const kHCPEventUserInfoErrorKey;
@@ -96,11 +111,38 @@ extern NSString *const kHCPEventUserInfoApplicationConfigKey;
  *  Object is then dispatched through the NSNotificationCenter.
  *
  *  @param name      namve of the event
+ *  @param appConfig application config that is attached to the event
+ *  @param taskId    id of the worker which generated the event
+ *  @param error     error that is attached to the event
+ *  @param data      data that is attached to the event
+ *
+ *  @return instance of the NSNotification
+ */
++ (NSNotification *)notificationWithName:(NSString *)name applicationConfig:(HCPApplicationConfig *)appConfig taskId:(NSString *)taskId error:(NSError *)error data:(NSMutableDictionary *)data;
+
+/**
+ *  Create instance of the NSNotification.
+ *  Object is then dispatched through the NSNotificationCenter.
+ *
+ *  @param name      namve of the event
  *  @param appConfig applicationn config that is attached to the event
  *  @param taskId    id of the worker which generated the event
  *
  *  @return instance of the NSNotification
  */
 + (NSNotification *)notificationWithName:(NSString *)name applicationConfig:(HCPApplicationConfig *)appConfig taskId:(NSString *)taskId;
+
+/**
+ *  Create instance of the NSNotification.
+ *  Object is then dispatched through the NSNotificationCenter.
+ *
+ *  @param name      namve of the event
+ *  @param appConfig applicationn config that is attached to the event
+ *  @param taskId    id of the worker which generated the event
+ *  @param data      data that is attached to the event
+ *
+ *  @return instance of the NSNotification
+ */
++ (NSNotification *)notificationWithName:(NSString *)name applicationConfig:(HCPApplicationConfig *)appConfig taskId:(NSString *)taskId data:(NSMutableDictionary *)data;
 
 @end

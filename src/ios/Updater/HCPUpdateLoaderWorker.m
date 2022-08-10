@@ -115,6 +115,8 @@
                 [_appConfigStorage store:newAppConfig inFolder:_pluginFiles.wwwFolder];
                 [self notifyNothingToUpdate:newAppConfig];
                 return;
+            } else {
+                [self notifyManifestDiffComplete:newAppConfig manifestDiff:manifestDiff];
             }
             
             // switch file structure to new release
@@ -275,6 +277,33 @@
     NSNotification *notification = [HCPEvents notificationWithName:kHCPUpdateIsReadyForInstallationEvent
                                                  applicationConfig:config
                                                             taskId:self.workerId];
+    
+    [[NSNotificationCenter defaultCenter] postNotification:notification];
+}
+
+/**
+ *  Send notification that content manifest diff is complete, return "updateFiles" list
+ *
+ *  @param config application config that was used for download
+ */
+- (void)notifyManifestDiffComplete:(HCPApplicationConfig *)config manifestDiff:(HCPManifestDiff *)manifestDiff {
+    if (_complitionBlock) {
+        _complitionBlock();
+    }
+
+    NSMutableDictionary *data = [[NSMutableDictionary alloc] init];
+    NSMutableArray *updateFilesList = [[NSMutableArray alloc] init];
+    data[@"updateFiles"] = updateFilesList;
+    if (manifestDiff.updateFileList) {
+        for ( HCPManifestFile *file in manifestDiff.updateFileList) {
+            [updateFilesList addObject:file.name];
+        }
+    }
+    
+    NSNotification *notification = [HCPEvents notificationWithName:kHCPManifestDiffCompleteEvent
+                                                 applicationConfig:config
+                                                            taskId:self.workerId
+                                                              data:data];
     
     [[NSNotificationCenter defaultCenter] postNotification:notification];
 }

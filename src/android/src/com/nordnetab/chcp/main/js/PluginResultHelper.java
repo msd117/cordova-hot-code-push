@@ -3,6 +3,7 @@ package com.nordnetab.chcp.main.js;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.nordnetab.chcp.main.events.IPluginEvent;
 import com.nordnetab.chcp.main.model.ChcpError;
 
@@ -10,6 +11,9 @@ import org.apache.cordova.PluginResult;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.List;
+
+import android.util.Log;
 
 /**
  * Created by Nikolay Demyankov on 29.07.15.
@@ -81,7 +85,17 @@ public class PluginResultHelper {
                 continue;
             }
 
-            dataNode.set(entry.getKey(), factory.textNode(value.toString()));
+            if (value instanceof List) {
+                ArrayNode arrayNode = factory.arrayNode();
+                for (Object curr : (List)value) {
+                    arrayNode.add(curr.toString());
+                }
+                dataNode.set(entry.getKey(), arrayNode);
+                Log.d("CHCP", "CHCP PluginResultHelper.createDataNode add array value: " + entry.getKey() + ": " + arrayNode);
+            } else {
+                dataNode.set(entry.getKey(), factory.textNode(value.toString()));
+                Log.d("CHCP", "CHCP PluginResultHelper.createDataNode add text value: " + entry.getKey() + ": " + factory.textNode(value.toString()));
+            }
         }
 
         return dataNode;
@@ -113,6 +127,7 @@ public class PluginResultHelper {
             resultObject.set(JsParams.General.ERROR, error);
         }
 
+        Log.d("CHCP", "CHCP PluginResultHelper.getResult resultObject: " + resultObject.toString());
         return new PluginResult(PluginResult.Status.OK, resultObject.toString());
     }
 

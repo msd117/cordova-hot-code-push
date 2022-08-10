@@ -2,9 +2,9 @@
 
 To format your messages, please, use a [markdown](https://guides.github.com/features/mastering-markdown/). It's not critical, but since other people might have the same problem - this will help them as well.
 
-Before creating a new issue - please, check that in [issues section](https://github.com/nordnet/cordova-hot-code-push/issues) there is no similar thread. If so - please, post your message in there with some description.
+Before creating a new issue - please, check that in [issues section](https://github.com/snipking/cordova-hot-code-push/issues) there is no similar thread. If so - please, post your message in there with some description.
 
-Also, make sure that you did read the wiki and the [error codes](https://github.com/nordnet/cordova-hot-code-push/wiki/Error-codes) section.
+Also, make sure that you did read the wiki and the [error codes](https://github.com/snipking/cordova-hot-code-push/wiki/Error-codes) section.
 
 Below are the sections, that you should try to include in your issue description. They are not mandatory, of course, but will make it easier to investigate and solve the problem.
 

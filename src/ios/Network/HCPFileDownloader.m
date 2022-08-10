@@ -8,6 +8,7 @@
 #import "HCPManifestFile.h"
 #import "NSData+HCPMD5.h"
 #import "NSError+HCPExtension.h"
+#import "HCPEvents.h"
 
 @interface HCPFileDownloader()<NSURLSessionDownloadDelegate> {
     NSArray *_filesList;
@@ -76,6 +77,8 @@ static NSUInteger const TIMEOUT = 300;
         _session = nil;
         _complitionHandler(error);
         return;
+    } else {
+        [self notifyUpdateDownloadProgress:nil fileName:((HCPManifestFile *)_filesList[_downloadCounter]).name];
     }
     
     _downloadCounter++;
@@ -87,6 +90,13 @@ static NSUInteger const TIMEOUT = 300;
     }
     
     [self launchDownloadTaskForFile:_filesList[_downloadCounter]];
+}
+
+-(void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(nullable NSError *)error {
+    if (error && _complitionHandler) {
+        _complitionHandler(error);
+        _session = nil;
+    }
 }
 
 - (void)launchDownloadTaskForFile:(HCPManifestFile *)file {
@@ -150,6 +160,26 @@ static NSUInteger const TIMEOUT = 300;
     
     // write data
     return [fileManager moveItemAtURL:loadedFile toURL:filePath error: error];
+}
+
+/**
+ *  Send notification that content manifest diff is complete, return "updateFiles" list
+ *
+ *  @param config application config that was used for download
+ */
+- (void)notifyUpdateDownloadProgress:(HCPApplicationConfig *)config fileName:(NSString *)fileName {
+
+    NSLog(@"File Download Success: %@", fileName);
+
+    NSMutableDictionary *data = [[NSMutableDictionary alloc] init];
+    data[@"fileName"] = fileName;
+    
+    NSNotification *notification = [HCPEvents notificationWithName:kHCPUpdateDownloadProgressEvent
+                                                 applicationConfig:config
+                                                            taskId:nil
+                                                              data:data];
+    
+    [[NSNotificationCenter defaultCenter] postNotification:notification];
 }
 
 

@@ -29,13 +29,38 @@ static NSString *const ERROR_USER_INFO_DESCRIPTION = @"description";
     NSError *error = notification.userInfo[kHCPEventUserInfoErrorKey];
     NSString *action = notification.name;
     
-    return [CDVPluginResult pluginResultWithActionName:action applicationConfig:appConfig error:error];
+    NSMutableDictionary *data = [[NSMutableDictionary alloc] init];
+    for (NSString *userInfoKey in [notification.userInfo allKeys]) {
+        if (![userInfoKey isEqualToString:kHCPEventUserInfoApplicationConfigKey] && ![userInfoKey isEqualToString:kHCPEventUserInfoErrorKey]) {
+            [data setValue:notification.userInfo[userInfoKey] forKey:userInfoKey];
+        }
+    }
+    
+    if ([data allKeys].count > 0) {
+        return [CDVPluginResult pluginResultWithActionName:action applicationConfig:appConfig data:[NSDictionary dictionaryWithDictionary: data] error:error];
+    } else {
+        return [CDVPluginResult pluginResultWithActionName:action applicationConfig:appConfig error:error];
+    }
 }
 
 + (CDVPluginResult *)pluginResultWithActionName:(NSString *)action applicationConfig:(HCPApplicationConfig *)appConfig error:(NSError *)error {
     NSDictionary *data = nil;
     if (appConfig) {
         data = @{DATA_USER_INFO_CONFIG: [appConfig toJson]};
+    }
+    
+    return [self pluginResultWithActionName:action data:data error:error];
+}
+
++ (CDVPluginResult *)pluginResultWithActionName:(NSString *)action applicationConfig:(HCPApplicationConfig *)appConfig data:(NSDictionary *)data error:(NSError *)error {
+    if (appConfig) {
+        if (data == nil) {
+            data = @{DATA_USER_INFO_CONFIG: [appConfig toJson]};
+        } else {
+            NSMutableDictionary *resultData = [NSMutableDictionary dictionaryWithDictionary:data];
+            [resultData setValue:[appConfig toJson] forKey:DATA_USER_INFO_CONFIG];
+            data = [NSDictionary dictionaryWithDictionary:resultData];
+        }
     }
     
     return [self pluginResultWithActionName:action data:data error:error];
