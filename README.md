@@ -1,6 +1,6 @@
-# THIS PROJECT IS FORK FROM [nordnet/cordova-hot-code-push](https://github.com/nordnet/cordova-hot-code-push)
+# THIS PROJECT IS DEPRECATED
 
-Because the origin project is stopped maintenance. We forked and do bug fix on this. PRs and ISSUEs welcome.
+We are not using this repo anymore, and we lack the manpower and the experience needed to maintain it. We are aware of the inconveniece that this may cause you. Feel free to use it as is, or create your own fork. See https://github.com/nordnet/cordova-hot-code-push/issues/371 for more information.
 
 # Cordova Hot Code Push Plugin
 
@@ -15,7 +15,7 @@ This plugin is intended to fix all that. When user starts the app for the first 
 
 As a result, your application receives updates of the web content as soon as possible, and still can work in offline mode. Also, plugin allows you to specify dependency between the web release and the native version to make sure, that new release will work on the older versions of the application.
 
-**Is it fine with App Store?** Yes, it is... as long as your content corresponds to what application is intended for and you don't ask user to click some button to update the web content. For more details please refer to [this wiki page](https://github.com/snipking/cordova-hot-code-push/wiki/App-Store-FAQ).
+**Is it fine with App Store?** Yes, it is... as long as your content corresponds to what application is intended for and you don't ask user to click some button to update the web content. For more details please refer to [this wiki page](https://github.com/nordnet/cordova-hot-code-push/wiki/App-Store-FAQ).
 
 ## Supported platforms
 
@@ -24,18 +24,18 @@ As a result, your application receives updates of the web content as soon as pos
 
 ### Installation
 
-This requires cordova 5.0+ (current stable 1.5.8)
+This requires cordova 5.0+ (current stable 1.5.3)
 
 ```sh
-cordova plugin add cordova-hot-code-push-plugin-renew
+cordova plugin add cordova-hot-code-push-plugin
 ```
 
 It is also possible to install via repo url directly (__unstable__)
 ```sh
-cordova plugin add https://github.com/snipking/cordova-hot-code-push.git
+cordova plugin add https://github.com/nordnet/cordova-hot-code-push.git
 ```
 
-At the end of the installation plugin will recommend you to install [Cordova Hot Code Push CLI client](https://github.com/snipking/cordova-hot-code-push-cli). This client will help you to:
+At the end of the installation plugin will recommend you to install [Cordova Hot Code Push CLI client](https://github.com/nordnet/cordova-hot-code-push-cli). This client will help you to:
 - easily generate necessary configuration files;
 - launch local server to listen for any changes in the web project and deploy new version immediately on the app.
 
@@ -43,7 +43,7 @@ Of course, you can use this plugin without the CLI client, but it will make your
 
 ### Quick start guide
 
-In this guide we will show how quickly you can test this plugin and start using it for development. For that we will install [development add-on](https://github.com/snipking/cordova-hot-code-push/wiki/Local-Development-Plugin).
+In this guide we will show how quickly you can test this plugin and start using it for development. For that we will install [development add-on](https://github.com/nordnet/cordova-hot-code-push/wiki/Local-Development-Plugin).
 
 1. Create new Cordova project using command line interface and add iOS/Android platforms:
 
@@ -102,7 +102,7 @@ In this guide we will show how quickly you can test this plugin and start using 
 
 From this point you can do local development, where all the changes are uploaded on the devices without the need to restart applications on every change you made.
 
-For production build do not forget to add the following to your `config.xml` file as it is a required property. Checkout the [wiki](https://github.com/snipking/cordova-hot-code-push/wiki/Cordova-config-preferences) for more information:
+For production build do not forget to add the following to your `config.xml` file as it is a required property. Checkout the [wiki](https://github.com/nordnet/cordova-hot-code-push/wiki/Cordova-config-preferences) for more information:
 
 ```xml
 <chcp>
@@ -112,6 +112,6 @@ For production build do not forget to add the following to your `config.xml` fil
 
 ### Documentation
 
-All documentation can be found in details in our [Wiki on GitHub](https://github.com/snipking/cordova-hot-code-push/wiki).
+All documentation can be found in details in our [Wiki on GitHub](https://github.com/nordnet/cordova-hot-code-push/wiki).
 
-If you have some questions/problems/suggestions - don't hesitate to post a [thread](https://github.com/snipking/cordova-hot-code-push/issues). If it's an actual issue - please, follow [this guide](https://github.com/snipking/cordova-hot-code-push/wiki/Issue-creation-guide) on how to do that properly.
+If you have some questions/problems/suggestions - don't hesitate to post a [thread](https://github.com/nordnet/cordova-hot-code-push/issues). If it's an actual issue - please, follow [this guide](https://github.com/nordnet/cordova-hot-code-push/wiki/Issue-creation-guide) on how to do that properly.

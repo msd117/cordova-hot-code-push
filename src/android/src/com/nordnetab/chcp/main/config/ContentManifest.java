@@ -9,9 +9,6 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.nordnetab.chcp.main.model.ManifestDiff;
 import com.nordnetab.chcp.main.model.ManifestFile;
-import com.nordnetab.chcp.main.events.ManifestDiffCompleteEvent;
-
-import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -155,8 +152,6 @@ public class ContentManifest {
                 addedFiles.add(newFile);
             }
         }
-
-        EventBus.getDefault().post(new ManifestDiffCompleteEvent(diff));
 
         return diff;
     }

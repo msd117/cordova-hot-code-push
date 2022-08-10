@@ -8,9 +8,6 @@ import com.nordnetab.chcp.main.utils.MD5;
 import com.nordnetab.chcp.main.utils.Paths;
 import com.nordnetab.chcp.main.utils.URLConnectionHelper;
 import com.nordnetab.chcp.main.utils.URLUtility;
-import com.nordnetab.chcp.main.events.UpdateDownloadProgressEvent;
-
-import org.greenrobot.eventbus.EventBus;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -89,8 +86,6 @@ public class FileDownloader {
         output.flush();
         output.close();
         input.close();
-
-        EventBus.getDefault().post(new UpdateDownloadProgressEvent(filePath));
 
         final String downloadedFileHash = md5.calculateHash();
         if (!downloadedFileHash.equals(checkSum)) {

@@ -1,7 +1,6 @@
 package com.nordnetab.chcp.main.utils;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.nordnetab.chcp.main.events.AssetsInstallationErrorEvent;
 import com.nordnetab.chcp.main.events.AssetsInstalledEvent;
@@ -42,7 +41,6 @@ public class AssetsHelper {
      * @see EventBus
      */
     public static void copyAssetDirectoryToAppDirectory(final Context applicationContext, final String fromDirectory, final String toDirectory) {
-        Log.d("CHCP", "AssetsHelper copyAssetDirectoryToAppDirectory from [" + fromDirectory + "] to [" + toDirectory + "]");
         if (isWorking) {
             return;
         }
