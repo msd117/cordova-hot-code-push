@@ -14,7 +14,11 @@ public final class JSAction {
     public static final String REQUEST_APP_UPDATE = "jsRequestAppUpdate";
     public static final String IS_UPDATE_AVAILABLE_FOR_INSTALLATION = "jsIsUpdateAvailableForInstallation";
     public static final String GET_VERSION_INFO = "jsGetVersionInfo";
-
+    public static final String DOWNLOAD_PROGRESS = "jsDownloadProgress";
+    public static final String NOTHING_UPDATE = "jsNothingUpdate";
+    public static final String UPDATE_INSTALLED = "jsUpdateInstalled";
+    public static final String UPDATE_INSTALL_FAILED = "jsUpdateInstallFailed";
+    public static final String UPDATE_DOWNLOAD_FAILED = "jsUpdateDownloadFailed";
     // Private API
     public static final String INIT = "jsInitPlugin";
 

@@ -15,12 +15,14 @@ NSString *const kHCPBeforeInstallEvent = @"chcp_beforeInstall";
 NSString *const kHCPUpdateInstallationErrorEvent = @"chcp_updateInstallFailed";
 NSString *const kHCPUpdateIsInstalledEvent = @"chcp_updateInstalled";
 NSString *const kHCPNothingToInstallEvent = @"chcp_nothingToInstall";
+NSString *const kHCPDownloadProgressEvent = @"chcp_downloadProgress";
 NSString *const kHCPBeforeBundleAssetsInstalledOnExternalStorageEvent = @"chcp_beforeAssetsInstalledOnExternalStorage";
 NSString *const kHCPBundleAssetsInstalledOnExternalStorageEvent = @"chcp_assetsInstalledOnExternalStorage";
 NSString *const kHCPBundleAssetsInstallationErrorEvent = @"chcp_assetsInstallationError";
 
 NSString *const kHCPEventUserInfoErrorKey = @"error";
 NSString *const kHCPEventUserInfoTaskIdKey = @"taskId";
+NSString *const kHCPEventUserInfoDataKey = @"data";
 NSString *const kHCPEventUserInfoApplicationConfigKey = @"appConfig";
 
 @implementation HCPEvents
@@ -29,6 +31,23 @@ NSString *const kHCPEventUserInfoApplicationConfigKey = @"appConfig";
 
 + (NSNotification *)notificationWithName:(NSString *)name applicationConfig:(HCPApplicationConfig *)appConfig taskId:(NSString *)taskId {
     return [HCPEvents notificationWithName:name applicationConfig:appConfig taskId:taskId error:nil];
+}
+
++ (NSNotification *)notificationWithName:(NSString *)name applicationConfig:(HCPApplicationConfig *)appConfig taskId:(NSString *)taskId data:(NSDictionary*)data{
+    NSMutableDictionary *userInfo = [[NSMutableDictionary alloc] init];
+       if (appConfig) {
+           userInfo[kHCPEventUserInfoApplicationConfigKey] = appConfig;
+       }
+       
+       if (taskId) {
+           userInfo[kHCPEventUserInfoTaskIdKey] = taskId;
+       }
+       
+       if (data) {
+           userInfo[kHCPEventUserInfoDataKey] = data;
+       }
+       
+       return [NSNotification notificationWithName:name object:nil userInfo:userInfo];
 }
 
 + (NSNotification *)notificationWithName:(NSString *)name applicationConfig:(HCPApplicationConfig *)appConfig taskId:(NSString *)taskId error:(NSError *)error {

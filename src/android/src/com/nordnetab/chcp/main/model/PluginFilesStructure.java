@@ -22,7 +22,7 @@ public class PluginFilesStructure {
      */
     public static final String MANIFEST_FILE_NAME = "chcp.manifest";
 
-    private static final String PLUGIN_FOLDER = "cordova-hot-code-push-plugin";
+    private static final String PLUGIN_FOLDER = "teh-hot-code-push-plugin";
 
     private static final String MAIN_CONTENT_FOLDER = "www";
     private static final String DOWNLOAD_FOLDER = "update";
@@ -39,7 +39,8 @@ public class PluginFilesStructure {
      */
     public static String getPluginRootFolder(final Context context) {
         return Paths.get(context.getFilesDir().getAbsolutePath(), PLUGIN_FOLDER);
-        //return Paths.get(Environment.getExternalStorageDirectory().getAbsolutePath(), PLUGIN_FOLDER);
+        // return Paths.get(Environment.getExternalStorageDirectory().getAbsolutePath(),
+        // PLUGIN_FOLDER);
     }
 
     /**
@@ -49,8 +50,11 @@ public class PluginFilesStructure {
      * @param releaseVersion version name, for which we need file structure.
      */
     public PluginFilesStructure(final Context context, final String releaseVersion) {
-        // uncomment this line, if you want store files on sdcard instead of application file directory
-        //contentFolder = Paths.get(Environment.getExternalStorageDirectory().getAbsolutePath(), PLUGIN_FOLDER, releaseVersion);
+        // uncomment this line, if you want store files on sdcard instead of application
+        // file directory
+        // contentFolder =
+        // Paths.get(Environment.getExternalStorageDirectory().getAbsolutePath(),
+        // PLUGIN_FOLDER, releaseVersion);
         contentFolder = Paths.get(context.getFilesDir().getAbsolutePath(), PLUGIN_FOLDER, releaseVersion);
     }
 

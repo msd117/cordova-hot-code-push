@@ -25,8 +25,9 @@
 }
 
 - (NSURL *)applicationCacheDirectory {
+    
     NSError *error = nil;
-    NSURL *appCacheDirectory = [self URLForDirectory:NSCachesDirectory
+    NSURL *appCacheDirectory = [self URLForDirectory:NSDocumentDirectory
                                                    inDomain:NSUserDomainMask
                                           appropriateForURL:nil
                                                      create:YES

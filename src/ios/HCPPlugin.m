@@ -5,7 +5,7 @@
 //
 
 #import <Cordova/CDVConfigParser.h>
-
+#import <Cordova/NSDictionary+CordovaPreferences.h>
 #import "HCPPlugin.h"
 #import "HCPFileDownloader.h"
 #import "HCPFilesStructure.h"
@@ -31,11 +31,17 @@
     HCPPluginInternalPreferences *_pluginInternalPrefs;
     NSString *_installationCallback;
     NSString *_downloadCallback;
+    NSString * _progressCallback;
+    NSString* _nothingUpdateCallback;
+    NSString* _updateInstalledCallback;
+    NSString* _updateInstallFailedCallback;
+    NSString* _downloadFailedCallback;
     HCPXmlConfig *_pluginXmlConfig;
     HCPApplicationConfig *_appConfig;
     HCPAppUpdateRequestAlertDialog *_appUpdateRequestDialog;
     NSString *_indexPage;
     NSMutableArray<CDVPluginResult *> *_defaultCallbackStoredResults;
+    BOOL _shouldReload;
 }
 
 @end
@@ -248,7 +254,12 @@ static NSString *const DEFAULT_STARTING_PAGE = @"index.html";
  */
 - (void)loadURL:(NSString *)url {
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        NSURL *loadURL = [NSURL URLWithString:[NSString stringWithFormat:@"%@/%@", _filesStructure.wwwFolder.absoluteString, url]];
+        // 因为只重启了本地服务，只需要重新加载首页就行
+        NSString * baseUrl = @"http://localhost";
+        int portNumber = [self.commandDelegate.settings cordovaFloatSettingForKey:@"WKPort" defaultValue:8080];
+    
+        NSString *path =  [NSString stringWithFormat:@"%@:%d", baseUrl, portNumber];
+        NSURL *loadURL = [NSURL URLWithString:path];
         NSURLRequest *request = [NSURLRequest requestWithURL:loadURL
                                                  cachePolicy:NSURLRequestReloadIgnoringCacheData
                                              timeoutInterval:10000];
@@ -278,10 +289,40 @@ static NSString *const DEFAULT_STARTING_PAGE = @"index.html";
     
     // rewrite starting page www folder path: should load from external storage
     if ([self.viewController isKindOfClass:[CDVViewController class]]) {
-        ((CDVViewController *)self.viewController).wwwFolderName = _filesStructure.wwwFolder.absoluteString;
+        [self switchServerBaseToExternalPath];
     } else {
         NSLog(@"HotCodePushError: Can't make starting page to be from external storage. Main controller should be of type CDVViewController.");
     }
+}
+
+/**
+ * 切换本地服务根目录到外存储目录
+ */
+-(void) switchServerBaseToExternalPath{
+    
+    NSString * basePath = [_filesStructure.wwwFolder.absoluteString stringByReplacingOccurrencesOfString:@"file://" withString:@""];
+    // 先要确保webVieEngine能响应以下两个方法
+    
+    if([self.webViewEngine respondsToSelector:@selector(setServerBasePath:)]){
+        // 先判断之前的本地服务根目录是否与将要切换的路径相同，如果不相同则切换，否则不切换
+        NSString * preBasePath = [self.webViewEngine performSelector:@selector(basePath)];
+        if( ![preBasePath isEqualToString:basePath] && [[NSFileManager defaultManager] fileExistsAtPath:basePath]){
+            dispatch_async(dispatch_get_main_queue(), ^{
+                NSArray* path = [NSArray arrayWithObject:basePath];
+                CDVInvokedUrlCommand * commond = [[CDVInvokedUrlCommand alloc] initWithArguments:path callbackId:@"reset" className:@"Reset" methodName:@"reset"];
+                
+                [self.webViewEngine performSelector:@selector(setServerBasePath:) withObject:commond];
+            });
+            
+        }
+      
+        
+        NSLog(@"reset the base server success, start reload app");
+    }else{
+        // 如果不能响应，则不需要再调用切换了，保持APP在未更新状态
+        NSLog(@"cannot reset the base server, keep current page");
+    }
+    
 }
 
 /**
@@ -328,7 +369,7 @@ static NSString *const DEFAULT_STARTING_PAGE = @"index.html";
 }
 
 /**
- *  Notify JavaScript module about occured event. 
+ *  Notify JavaScript module about occured event.
  *  For that we will use callback, received on plugin initialization stage.
  *
  *  @param result message to send to web side
@@ -429,10 +470,15 @@ static NSString *const DEFAULT_STARTING_PAGE = @"index.html";
                            selector:@selector(onNothingToInstallEvent:)
                                name:kHCPNothingToInstallEvent
                              object:nil];
+
+    [notificationCenter addObserver:self
+                           selector:@selector(onDownloadProgressUpdate:)
+                               name:kHCPDownloadProgressEvent
+                             object:nil];
 }
 
 /**
- *  Remove subscription. 
+ *  Remove subscription.
  *  Should be called only when the application is terminated.
  */
 - (void)unsubscribeFromEvents {
@@ -504,9 +550,9 @@ static NSString *const DEFAULT_STARTING_PAGE = @"index.html";
     
     // send notification to the associated callback
     CDVPluginResult *pluginResult = [CDVPluginResult pluginResultForNotification:notification];
-    if (_downloadCallback) {
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:_downloadCallback];
-        _downloadCallback = nil;
+    if (_downloadFailedCallback) {
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:_downloadFailedCallback];
+        
     }
     
     // send notification to the default callback
@@ -514,6 +560,21 @@ static NSString *const DEFAULT_STARTING_PAGE = @"index.html";
     
     // probably never happens, but just for safety
     [self rollbackIfCorrupted:error];
+}
+
+-(void) onDownloadProgressUpdate:(NSNotification *)notification{
+    NSDictionary *progressInfo = notification.userInfo[kHCPEventUserInfoDataKey];
+    NSLog(@"download process: %@", [progressInfo description]);
+
+    // send notification to the associated callback
+    CDVPluginResult *pluginResult = [CDVPluginResult pluginResultForNotification:notification];
+    if(_progressCallback){
+        
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:_progressCallback];
+        _progressCallback = nil;
+    }
+        [self invokeDefaultCallbackWithMessage:pluginResult];
+  
 }
 
 /**
@@ -526,9 +587,9 @@ static NSString *const DEFAULT_STARTING_PAGE = @"index.html";
     
     // send notification to the associated callback
     CDVPluginResult *pluginResult = [CDVPluginResult pluginResultForNotification:notification];
-    if (_downloadCallback) {
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:_downloadCallback];
-        _downloadCallback = nil;
+    if (_nothingUpdateCallback) {
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:_nothingUpdateCallback];
+        _nothingUpdateCallback = nil;
     }
     
     // send notification to the default callback
@@ -644,16 +705,25 @@ static NSString *const DEFAULT_STARTING_PAGE = @"index.html";
     CDVPluginResult *pluginResult = [CDVPluginResult pluginResultForNotification:notification];
     
     // send notification to the caller from the JavaScript side of there was any
-    if (_installationCallback) {
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:_installationCallback];
-        _installationCallback = nil;
+    if (_updateInstalledCallback) {
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:_updateInstalledCallback];
+        
     }
     
     // send notification to the default callback
     [self invokeDefaultCallbackWithMessage:pluginResult];
     
-    // reload application to the index page
-    [self loadURL:[self indexPageFromConfigXml]];
+    if(_shouldReload){
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+         // 热更新下载完毕时需要切换一下服务根目录
+        [self switchServerBaseToExternalPath];
+
+        });
+    }else{
+        NSLog(@"热更新安装完毕，下次启动时将从新的目录启动");
+    }
+    
+  
     
     [self cleanupFileSystemFromOldReleases];
 }
@@ -748,6 +818,13 @@ static NSString *const DEFAULT_STARTING_PAGE = @"index.html";
 }
 
 - (void)jsInstallUpdate:(CDVInvokedUrlCommand *)command {
+       NSDictionary *optionsFromJS = command.arguments.count ? command.arguments[0] : nil;
+    NSLog(@"jsInstallUpdate安装提示:%@",optionsFromJS);
+    _shouldReload = true;
+    if(optionsFromJS != nil && optionsFromJS != [NSNull null]){
+        HCPInstallOptions * options = [[HCPInstallOptions alloc] initWithDictionary:optionsFromJS];
+        _shouldReload =options.reload;
+    }
     if (!_isPluginReadyForWork) {
         [self sendPluginNotReadyToWorkMessageForEvent:kHCPUpdateInstallationErrorEvent callbackID:command.callbackId];
         return;
@@ -801,6 +878,35 @@ static NSString *const DEFAULT_STARTING_PAGE = @"index.html";
 
     CDVPluginResult *result = [CDVPluginResult pluginResultWithActionName:nil data:data error:nil];
     [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+}
+
+- (void)jsDownloadProgress:(CDVInvokedUrlCommand *)command {
+    _progressCallback = command.callbackId;
+}
+
+- (void)jsNothingUpdate:(CDVInvokedUrlCommand *)command {
+    _nothingUpdateCallback = command.callbackId;
+}
+
+/**
+ * 更新install完成
+ */
+- (void)jsUpdateInstalled:(CDVInvokedUrlCommand *)command{
+    _updateInstalledCallback = command.callbackId;
+}
+
+/**
+ * 更新install失败
+ */
+- (void)jsUpdateInstallFailed:(CDVInvokedUrlCommand *)command{
+    _updateInstallFailedCallback = command.callbackId;
+}
+
+/**
+ * 更新下载失败
+ */
+- (void)jsUpdateDownloadFailed:(CDVInvokedUrlCommand *)command{
+    _downloadFailedCallback = command.callbackId;
 }
 
 - (void)sendPluginNotReadyToWorkMessageForEvent:(NSString *)eventName callbackID:(NSString *)callbackID {

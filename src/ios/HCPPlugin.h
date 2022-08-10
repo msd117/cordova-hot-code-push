@@ -7,6 +7,7 @@
 #import <Cordova/CDVPlugin.h>
 #import <Cordova/CDV.h>
 #import "HCPFetchUpdateOptions.h"
+#import "HCPInstallOptions.h"
 
 /**
  *  Plugin main class
@@ -19,7 +20,7 @@
  *  Fetch update preferences. Used by default if none provided from JS side.
  *  Can be used to controll plugin's workflow from the native side.
  */
-@property (nonatomic, strong) HCPFetchUpdateOptions *defaultFetchUpdateOptions;
+@property(nonatomic, strong) HCPFetchUpdateOptions *defaultFetchUpdateOptions;
 
 #pragma mark Methods, invoked from JavaScript
 
@@ -73,4 +74,28 @@
  */
 - (void)jsGetVersionInfo:(CDVInvokedUrlCommand *)command;
 
+/**
+ * 更新下载
+ */
+- (void)jsDownloadProgress:(CDVInvokedUrlCommand *)command;
+
+/**
+ * 无需更新
+ */
+- (void)jsNothingUpdate:(CDVInvokedUrlCommand *)command;
+
+/**
+ * 更新install完成
+ */
+- (void)jsUpdateInstalled:(CDVInvokedUrlCommand *)command;
+
+/**
+ * 更新install失败
+ */
+- (void)jsUpdateInstallFailed:(CDVInvokedUrlCommand *)command;
+
+/**
+ * 更新下载失败
+ */
+- (void)jsUpdateDownloadFailed:(CDVInvokedUrlCommand *)command;
 @end

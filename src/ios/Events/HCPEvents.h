@@ -42,6 +42,7 @@ extern NSString *const kHCPUpdateIsInstalledEvent;
  *  Event is dispatched when there is nothing to install.
  */
 extern NSString *const kHCPNothingToInstallEvent;
+extern NSString *const kHCPNothingToInstallEvent;
 
 /**
  *  Event is dispatched right before plugin will start installing application assets on the external storage.
@@ -59,6 +60,11 @@ extern NSString *const kHCPBundleAssetsInstalledOnExternalStorageEvent;
 extern NSString *const kHCPBundleAssetsInstallationErrorEvent;
 
 /**
+ * Envent for upgrade files download progress
+*/
+extern NSString *const kHCPDownloadProgressEvent;
+
+/**
  *  Key for error object in the user info dictionary that is attached to the event.
  */
 extern NSString *const kHCPEventUserInfoErrorKey;
@@ -67,11 +73,14 @@ extern NSString *const kHCPEventUserInfoErrorKey;
  *  Key for the worker id object in the user info dictionary that is attached to the event.
  */
 extern NSString *const kHCPEventUserInfoTaskIdKey;
+extern NSString *const kHCPEventUserInfoDataKey;
 
 /**
  *  Key for the applpication config object in the user info dictionary that is attached to the event.
  */
 extern NSString *const kHCPEventUserInfoApplicationConfigKey;
+
+extern NSString *const kHCPEventUserInfoDataKey;
 
 /**
  *  Helper class tor create plugin specific notifications about work process (download or installation).
@@ -102,5 +111,6 @@ extern NSString *const kHCPEventUserInfoApplicationConfigKey;
  *  @return instance of the NSNotification
  */
 + (NSNotification *)notificationWithName:(NSString *)name applicationConfig:(HCPApplicationConfig *)appConfig taskId:(NSString *)taskId;
++ (NSNotification *)notificationWithName:(NSString *)name applicationConfig:(HCPApplicationConfig *)appConfig taskId:(NSString *)taskId data:(NSDictionary *)data;
 
 @end
